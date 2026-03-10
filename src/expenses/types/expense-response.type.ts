@@ -25,7 +25,7 @@ export type ExpenseListResponse = {
         // Total de registros disponibles
         total: number
         // Cantidad de registros retornados
-        cound: number
+        count: number
         // Suma total de todos los montos
         totalAmount: number
     }
