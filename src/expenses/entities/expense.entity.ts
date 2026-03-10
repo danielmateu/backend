@@ -14,10 +14,11 @@ export class Expense {
     // Categoria a la que pertenece el gasto (Oficina, Servicios, etc...)
     category: string
 
+    // Fecha en la que se realizó el gasto
     date: Date
 
     // Fecha en la que el gasto se ha creado
-    // createdAt: Date
+    createdAt: Date
 
     // Fecha en la que el gasto se actualizó
     updatedAt: Date
