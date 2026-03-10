@@ -26,7 +26,7 @@ Backend para la aplicación de gestión de gastos. Proporciona endpoints para cr
 ```bash
 
 # Clonamos repo
-git clone <URL-del-repo>
+git clone https://github.com/danielmateu/backend.git
 
 # Accedemos al proyecto
 cd backend
