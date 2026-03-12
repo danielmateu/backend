@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense } from './entities/expense.entity';
-import { ExpenseInternalException, ExpenseNotFoundException } from './exceptions/expense.exceptions';
+import { ExpenseInternalException, ExpenseNotFoundException, ExpensValidationException } from './exceptions/expense.exceptions';
 
 @Injectable()
 export class ExpensesService {
@@ -17,6 +17,20 @@ export class ExpensesService {
   create(createExpenseDto: CreateExpenseDto): Expense {
     // return 'This action adds a new expense';
     try {
+
+      if (!createExpenseDto.description?.trim()) {
+        throw new ExpensValidationException({ description: ['La descripción es obligatoria'] })
+      }
+
+      if (createExpenseDto.amount <= 0) {
+        throw new ExpensValidationException({ amount: ['El monto debe ser mayor que 0'] })
+      }
+
+      const parsedDate = new Date(createExpenseDto.date)
+      if (Number.isNaN(parsedDate.getTime())) {
+        throw new ExpensValidationException({ date: ['La fecha no es válida'] })
+      }
+
       const id = this.generateId()
       const now = new Date()
 
@@ -77,6 +91,14 @@ export class ExpensesService {
     try {
       const expense = this.findOne(id)
 
+      if (updateExpenseDto.description !== undefined && !updateExpenseDto.description.trim()) {
+        throw new ExpensValidationException({ description: ['La descripción no puede estar vacía'] })
+      }
+
+      if (updateExpenseDto.amount !== undefined && updateExpenseDto.amount <= 0) {
+        throw new ExpensValidationException({ amount: ['El monto debe ser mayor que 0'] })
+      }
+
       if (updateExpenseDto.description !== undefined) {
         expense.description = updateExpenseDto.description
       }
@@ -110,7 +132,14 @@ export class ExpensesService {
   remove(id: string): void {
     // return `This action removes a #${id} expense`;
     try {
+
+      const expense = this.findOne(id)
+      if (!expense) {
+        throw new ExpenseNotFoundException(id)
+      }
+
       this.expenses.delete(id)
+      // console.log(`Gasto con ID ${id} eliminado correctamente`)
     } catch (error) {
       if (error instanceof ExpenseInternalException) {
         `Error al eliminar el gasto: ${error instanceof Error ? error.message : 'Error desconocido'}`
