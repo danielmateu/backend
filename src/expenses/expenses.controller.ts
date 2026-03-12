@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import type { ExpenseListResponse, ExpenseResponse } from './types/expense-response.type';
-import { ExpenseInternalException, ExpenseNotFoundException } from './exceptions/expense.exceptions';
+import { ExpenseInternalException, ExpenseNotFoundException, ExpensValidationException } from './exceptions/expense.exceptions';
 
 @Controller('expenses')
 export class ExpensesController {
@@ -194,6 +194,14 @@ export class ExpensesController {
     if (error instanceof ExpenseNotFoundException) {
       throw new NotFoundException({
         statusCode: HttpStatus.NOT_FOUND,
+        message: error.message,
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    if (error instanceof ExpensValidationException) {
+      throw new BadRequestException({
+        statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
         timestamp: new Date().toISOString()
       })
